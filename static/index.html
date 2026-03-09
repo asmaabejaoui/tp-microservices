@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TP1 Microservices - Interface</title>
+    <style>
+        body { font-family: 'Segoe UI', sans-serif; background-color: #f4f7f6; display: flex; justify-content: center; padding-top: 50px; }
+        .card { background: white; padding: 30px; border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1); width: 450px; }
+        h1 { color: #2c3e50; font-size: 22px; margin-bottom: 20px; text-align: center; }
+        .input-group { display: flex; gap: 10px; margin-bottom: 20px; }
+        input { flex: 1; padding: 12px; border: 2px solid #dfe6e9; border-radius: 6px; outline: none; transition: border-color 0.3s; }
+        input:focus { border-color: #3498db; }
+        button { background: #3498db; color: white; border: none; padding: 12px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; transition: background 0.3s; }
+        button:hover { background: #2980b9; }
+        #result { background: #2d3436; color: #55efc4; padding: 15px; border-radius: 6px; font-family: 'Courier New', monospace; font-size: 14px; white-space: pre-wrap; min-height: 100px; border: 1px solid #1e272e; }
+        .status { font-size: 12px; color: #7f8c8d; margin-bottom: 5px; }
+    </style>
+</head>
+<body>
+
+<div class="card">
+    <h1>Mon TP Microservices</h1>
+    <p class="status">Statut : Connecté à la Gateway (Port 8002)</p>
+    
+    <div class="input-group">
+        <input type="number" id="userId" placeholder="ID Utilisateur (1, 2...)" value="1">
+        <button onclick="getUserData()">Chercher</button>
+    </div>
+
+    <div id="result">Les données apparaîtront ici...</div>
+</div>
+
+<script>
+    async function getUserData() {
+        const userId = document.getElementById('userId').value;
+        const resultDisplay = document.getElementById('result');
+        
+        resultDisplay.textContent = "Chargement en cours...";
+        resultDisplay.style.color = "#55efc4";
+
+        try {
+            // IMPORTANT : On appelle le port 8002 (La Gateway)
+            const response = await fetch(`http://localhost:8002/api/users/${userId}`);
+            
+            if (!response.ok) {
+                throw new Error(`Erreur HTTP: ${response.status}`);
+            }
+
+            const data = await response.json();
+            
+            // On affiche le résultat formaté en JSON
+            resultDisplay.textContent = JSON.stringify(data, null, 2);
+            
+        } catch (error) {
+            resultDisplay.style.color = "#ff7675"; // Rouge si erreur
+            resultDisplay.textContent = "Erreur : Impossible de joindre la Gateway.\n" + 
+                                       "Vérifie que le service sur le port 8002 est lancé.";
+        }
+    }
+</script>
+
+</body>
+</html>
